@@ -25,7 +25,12 @@
             "aot": false,
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "./node_modules/nodecycler-data/dist/",
+                "output": "./data/"
+              }
             ],
             "styles": [
               "src/styles.scss"
@@ -90,7 +95,12 @@
             "karmaConfig": "karma.conf.js",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "./node_modules/nodecycler-data/dist/",
+                "output": "./data/"
+              }
             ],
             "styles": [
               "src/styles.scss"
