@@ -9,8 +9,11 @@ import {geolocationError, setPosition} from '../store/position/position.actions'
 export class GeolocationService {
   private id = null;
 
+  public position$ = this.store.select('position');
+
   constructor(private store: Store<AppState>) {
   }
+
 
   start() {
     if (!navigator.geolocation) {

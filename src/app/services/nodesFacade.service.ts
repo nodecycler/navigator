@@ -24,7 +24,8 @@ const selectRouteIds = createSelector(selectNodes,
 @Injectable()
 export class NodesFacadeService {
   public nodes$ = this.store.select(selectNodes);
-  public routes$ = this.store.select(selectRouteIds).pipe(
+  public routeIds$ = this.store.select(selectRouteIds);
+  public routes$ = this.routeIds$.pipe(
     mergeMap(routeIds => this.fetchRouteDataForRouteIds(routeIds))
   );
 

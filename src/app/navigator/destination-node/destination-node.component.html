@@ -1,0 +1,5 @@
+<ul *ngIf="node">
+  <li class="remaining">{{remaining}}</li>
+  <li class="progress"><span [style.width]="percentage"></span></li>
+  <li class="number">{{node.number}}</li>
+</ul>

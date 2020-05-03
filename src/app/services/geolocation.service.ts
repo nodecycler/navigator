@@ -11,6 +11,8 @@ import {ACTIVITY} from '../../mock/activity';
 export class GeolocationService {
   private id = null;
 
+  public position$ = this.store.select('position');
+
   constructor(private store: Store<AppState>) {
   }
 

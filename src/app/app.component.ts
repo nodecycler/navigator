@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {GeolocationService} from './services/geolocation.service';
 import {WakeLockService} from './services/wake-lock.service';
+import {filter, first} from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -8,7 +9,7 @@ import {WakeLockService} from './services/wake-lock.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  title = 'Node cycler Navigator';
+  loading = true;
 
   constructor(
     private geo: GeolocationService,
@@ -19,6 +20,12 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.wakeLock.start();
     this.geo.start();
+    this.geo.position$.pipe(
+      filter(state => !!state.location),
+      first(),
+    ).subscribe(() => {
+      this.loading = false;
+    });
   }
 
 }

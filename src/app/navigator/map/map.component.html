@@ -1,0 +1,37 @@
+<mgl-map
+  *ngIf="center && routes"
+  [style]="'mapbox://styles/mapbox/outdoors-v11'"
+  [zoom]="[zoom]"
+  [pitch]="[pitch]"
+  [bearing]="[bearing]"
+  movingMethod="easeTo"
+  [interactive]="false"
+  [center]="center"
+>
+  <mgl-geojson-source
+    *ngFor="let route of routes"
+    [id]="route"
+    data="./data/routes/{{route}}.json"
+  ></mgl-geojson-source>
+  <mgl-layer
+    *ngFor="let route of routes"
+    id="layer-{{route}}"
+    [source]="route"
+    type="line"
+    [paint]="{
+      'line-color': activeRoute && activeRoute.properties.pid == route ? '#38b831' : '#b81f2b',
+      'line-width': 10
+    }"
+  ></mgl-layer>
+  <mgl-marker
+    *ngIf="marker"
+    [lngLat]="marker"
+  >
+    <div class="here"></div>
+  </mgl-marker>
+  <mgl-marker *ngFor="let node of nodes"
+              [lngLat]="node.location"
+  >
+    <div class="node-marker">{{node.number}}</div>
+  </mgl-marker>
+</mgl-map>

@@ -1,0 +1,46 @@
+:host {
+  display: block;
+  width: 100%;
+}
+ul{
+  list-style: none;
+  padding: 0;
+  margin: 8px;
+  background: white;
+  border-radius: 99px;
+  height: 20px;
+  border: 1px solid #666;
+  display: flex;
+  width: auto;
+  position: relative;
+}
+.remaining {
+  line-height: 20px;
+  background: forestgreen;
+  padding: 0 16px;
+  color: white;
+  border-radius: 99px 0 0 99px;
+}
+.progress {
+  flex: 1;
+  span {
+    background: forestgreen;
+    border-radius: 0 99px 99px 0;
+    display: block;
+    height: 100%;
+  }
+}
+.number {
+  position: absolute;
+  right: -5px;
+  top: -7px;
+
+  background: white;
+  border: solid 2px black;
+  border-radius: 50%;
+  width: 2em;
+  height: 2em;
+  line-height: 2em;
+  text-align: center;
+  font-size: 15px;
+}
