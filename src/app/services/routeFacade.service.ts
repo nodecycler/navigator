@@ -8,6 +8,7 @@ import {FeatureCollection} from 'geojson';
 import {NodesFacadeService} from './nodesFacade.service';
 
 const selectRouteState = (state: AppState) => state.route;
+const selectClosestRoutes = createSelector(selectRouteState, (state => state.closestRoutes));
 
 @Injectable()
 export class RouteFacadeService {
@@ -22,6 +23,7 @@ export class RouteFacadeService {
       })),
     ))
   );
+  public closestRoutes$ = this.store.select(selectClosestRoutes);
 
   constructor(private store: Store<AppState>, private nodesFacade: NodesFacadeService) {
   }
