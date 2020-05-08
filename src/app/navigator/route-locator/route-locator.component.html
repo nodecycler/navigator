@@ -1,7 +1,13 @@
 <div class="container">
   <ul>
     <li *ngFor="let route of routes">
-      {{route.route.properties.pid}} - {{route.point.properties.dist}}
+      <div class="number">
+        {{route.begin}} &#9656; {{route.end}}
+      </div>
+      <div class="distance">
+        {{route.distance}}
+      </div>
+      <div class="bearing" [style.transform]="route.bearingStyle"></div>
     </li>
   </ul>
 </div>
