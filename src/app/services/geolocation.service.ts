@@ -21,25 +21,32 @@ export class GeolocationService {
       this.stop();
     }
 
-    let i = 0;
+    const positions = ACTIVITY.splice(0, 2);
+    this.dispatch(positions[0]);
+
+    let i = 1;
     this.id = setInterval(() => {
-      this.store.dispatch(setPosition({
-        coords: {
-          accuracy: 0,
-          altitude: 0,
-          altitudeAccuracy: 0,
-          heading: 0,
-          latitude: ACTIVITY[i][1],
-          longitude: ACTIVITY[i][0],
-          speed: 0,
-        }
-      }));
-      i++;
-      if (i === ACTIVITY.length) {
+      if (i === positions.length) {
         i = 0;
       }
+      this.dispatch(positions[i]);
+      i++;
     }, 500);
 
+  }
+  dispatch(coordinates) {
+    this.store.dispatch(setPosition({
+      coords: {
+        accuracy: 0,
+        altitude: 0,
+        altitudeAccuracy: 0,
+        heading: 0,
+        latitude: coordinates[1],
+        longitude: coordinates[0],
+        speed: 0,
+      }
+
+    }));
   }
 
   stop() {
