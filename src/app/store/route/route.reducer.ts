@@ -1,6 +1,6 @@
 import {Action, createReducer, on} from '@ngrx/store';
 import * as Actions from './route.actions';
-import {RouteState} from './route.types';
+import {RouteState, ClosestRoute} from './route.types';
 import {bearing, lineDistance, lineSlice, lineString} from '@turf/turf';
 import {Feature, LineString, Point} from 'geojson';
 
@@ -10,7 +10,9 @@ const initialState: RouteState = {
   bearing: 0,
   destinationNodeId: null,
   routeProgress: null,
+  closestRoutes: [],
 };
+
 const calculateRouteProgress = (route: Feature<LineString>, point: Feature<Point>) => {
   if (!route || !point) {
     return null;
@@ -38,29 +40,48 @@ const calculateDestinationAndProgress = (
 
 const reducer = createReducer(
   initialState,
-  on(Actions.setCurrentRoute, (state, {route, point}) => {
-    let destinationNodeId = null;
-    let routeProgress = null;
+  on(Actions.setClosestRoutes, (state, action) => {
+    if (action.routes.length === 0) {
+      return {
+        route: null,
+        point: null,
+        bearing: 0,
+        destinationNodeId: null,
+        routeProgress: null,
+        closestRoutes: [],
+      };
+    }
 
-    if (state.route && route && state.route.properties.pid === route.properties.pid) {
-      [destinationNodeId, routeProgress] = calculateDestinationAndProgress(route, state.point, point);
+    const {route, point} = action.routes[0];
+    if (point.properties.dist < 20) {
+      // there is a currentRoute
+      let destinationNodeId = null;
+      let routeProgress = null;
+
+      if (state.route && route && state.route.properties.pid === route.properties.pid) {
+        [destinationNodeId, routeProgress] = calculateDestinationAndProgress(route, state.point, point);
+      }
+
+      return {
+        route,
+        point,
+        bearing: state.point && point ? bearing(state.point, point) : 0,
+        destinationNodeId,
+        routeProgress,
+        closestRoutes: [],
+      };
     }
 
     return {
-      route,
-      point,
-      bearing: state.point && point ? bearing(state.point, point) : 0,
-      destinationNodeId,
-      routeProgress,
+      route: null,
+      point: null,
+      bearing: 0,
+      destinationNodeId: null,
+      routeProgress: null,
+      closestRoutes: action.routes,
     };
-  }),
-  on(Actions.clearCurrentRoute, (state) => ({
-    route: null,
-    point: null,
-    bearing: 0,
-    destinationNodeId: null,
-    routeProgress: null,
-  }))
+
+  })
 );
 
 export function routeReducer(state: RouteState = initialState, action: Action) {
