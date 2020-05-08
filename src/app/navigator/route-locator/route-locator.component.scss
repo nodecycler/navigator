@@ -23,6 +23,7 @@ li {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  box-shadow: 0 0 8px rgba(0, 0, 0, .4);
 }
 .number {
   font-weight: bold;
@@ -33,7 +34,6 @@ li {
 }
 .bearing {
   transform-origin: 8px 48px;
-  animation: rotate 1s linear infinite;
   position: absolute;
   top: -8px;
   left: calc(50% - 8px);
