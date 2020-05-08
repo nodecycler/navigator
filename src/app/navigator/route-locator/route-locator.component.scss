@@ -1,14 +1,18 @@
 .container {
   width: 100vw;
-  padding: 0 25px;
+  padding: 25px;
   box-sizing: border-box;
+  background: rgba(255,255,255, .4);
+}
+p {
+  text-align: center;
 }
 ul {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
 }
 li {
   position: relative;
@@ -26,10 +30,11 @@ li {
   box-shadow: 0 0 8px rgba(0, 0, 0, .4);
 }
 .number {
-  font-weight: bold;
+  font-weight: var(--font-weight-semibold);
   font-size: 18px;
 }
 .distance {
+  font-weight: var(--font-weight-light);
   font-size: 14px;
 }
 .bearing {

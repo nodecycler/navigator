@@ -21,7 +21,7 @@ export class GeolocationService {
       this.stop();
     }
 
-    const positions = ACTIVITY.splice(0, 2);
+    const positions = ACTIVITY;
     this.dispatch(positions[0]);
 
     let i = 1;
