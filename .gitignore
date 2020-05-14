@@ -3,6 +3,9 @@
 # compiled output
 /dist
 /tmp
+/www
+/platforms
+/plugins
 /out-tsc
 # Only exists if Bazel was run
 /bazel-out
