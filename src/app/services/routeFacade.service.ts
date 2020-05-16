@@ -20,6 +20,7 @@ export class RouteFacadeService {
       map(nodes => ({
         node: nodes.find(node => node.id === activeRouteState.destinationNodeId),
         progress: activeRouteState.routeProgress,
+        total: activeRouteState.route ? activeRouteState.route.properties.Shape_Length : null
       })),
     ))
   );

@@ -17,10 +17,10 @@ export class DestinationNodeComponent implements OnInit {
   }
 
   ngOnInit() {
-    combineLatest([this.route.destinationNode$, this.route.activeRoute$])
-      .subscribe(([{node, progress}, routeState]) => {
+    combineLatest([this.route.destinationNode$])
+      .subscribe(([{node, progress, total}]) => {
         this.node = node;
-        this.total = routeState.route ? routeState.route.properties.Shape_Length : null;
+        this.total = total;
         this.progress = progress;
       });
   }

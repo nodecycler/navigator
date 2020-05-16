@@ -31,7 +31,7 @@ export class GeolocationService {
       }
       this.dispatch(positions[i]);
       i++;
-    }, 500);
+    }, 1200);
 
   }
   dispatch(coordinates) {

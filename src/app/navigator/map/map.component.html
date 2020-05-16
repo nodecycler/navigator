@@ -19,7 +19,7 @@
     [source]="route"
     type="line"
     [paint]="{
-      'line-color': activeRoute && activeRoute.properties.pid == route ? '#579120' : '#85DD31',
+      'line-color': getRouteColor(route),
       'line-width': 6
     }"
   ></mgl-layer>

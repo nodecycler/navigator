@@ -6,6 +6,7 @@ import {DestinationNodeComponent} from './destination-node/destination-node.comp
 import {MapComponent} from './map/map.component';
 import {NgxMapboxGLModule} from 'ngx-mapbox-gl';
 import { RouteLocatorComponent } from './route-locator/route-locator.component';
+import {NearbyNodeComponent} from './nearby-node/nearby-node.component';
 
 @NgModule({
   declarations: [
@@ -13,6 +14,7 @@ import { RouteLocatorComponent } from './route-locator/route-locator.component';
     DestinationNodeComponent,
     MapComponent,
     RouteLocatorComponent,
+    NearbyNodeComponent
   ],
   exports: [
     NavigatorComponent
