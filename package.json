@@ -1,6 +1,6 @@
 {
   "name": "navigator",
-  "version": "0.0.0",
+  "version": "1.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -8,7 +8,8 @@
     "build:android": "ng build --prod --base-href=./ --output-path www",
     "deploy": "ng deploy --base-href=/navigator/",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "version": "npx cordova-set-version && git add config.xml"
   },
   "private": true,
   "dependencies": {
