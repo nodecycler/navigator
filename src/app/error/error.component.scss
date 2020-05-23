@@ -1,0 +1,74 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  text-align: center;
+
+  background: #DDE0C9;
+  padding: 25px;
+}
+
+svg.loading-bike {
+  width: 100px;
+  margin: 0 auto;
+  overflow: hidden;
+  color: black;
+  fill: black;
+
+}
+svg.logo {
+  margin: 0 auto;
+  max-width: 450px;
+}
+@keyframes road {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-107%);
+  }
+}
+
+@keyframes road2 {
+  from {
+    transform: translateX(107%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.road {
+  &.back {
+    animation: road .6s linear;
+    animation-iteration-count: infinite;
+  }
+
+  &.front {
+    animation: road2 .6s linear;
+    animation-iteration-count: infinite;
+  }
+}
+
+.rotate {
+  animation: rotate .6s linear;
+  animation-iteration-count: infinite;
+
+  &.back {
+    transform-origin: 20% 56%;
+  }
+
+  &.front {
+    transform-origin: 80% 56%;
+  }
+
+}

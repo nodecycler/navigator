@@ -1,2 +1,3 @@
 <app-navigator></app-navigator>
-<app-loading *ngIf="loading"></app-loading>
+<app-loading *ngIf="loading && !error"></app-loading>
+<app-error *ngIf="error"></app-error>
