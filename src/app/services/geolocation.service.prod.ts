@@ -6,7 +6,7 @@ import {geolocationError, setPosition} from '../store/position/position.actions'
 @Injectable({
   providedIn: 'root'
 })
-export class GeolocationServiceProd {
+export class GeolocationService {
   private id = null;
 
   public position$ = this.store.select('position');
@@ -25,10 +25,8 @@ export class GeolocationServiceProd {
     }
 
     this.id = navigator.geolocation.watchPosition(({coords}) => {
-      console.log("got coords");
       this.store.dispatch(setPosition({coords}));
     }, err => {
-      console.log("error", err);
       this.store.dispatch(geolocationError());
     }, {enableHighAccuracy: true});
   }

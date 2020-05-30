@@ -4,7 +4,8 @@ import {createSelector, Store} from '@ngrx/store';
 import {mergeMap} from 'rxjs/operators';
 import {combineLatest, Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import {FeatureCollection} from 'geojson';
+import {Feature, FeatureCollection, LineString} from 'geojson';
+import {Route} from '../store/route/route.types';
 
 const selectNodes = (state: AppState) => state.nodes;
 
@@ -33,6 +34,6 @@ export class NodesFacadeService {
   }
 
   private fetchRouteDataForRouteIds(routeIds: string[]) {
-    return combineLatest(routeIds.map(id => this.http.get(`./data/routes/${id}.json`))) as Observable<FeatureCollection[]>;
+    return combineLatest(routeIds.map(id => this.http.get(`./data/routes/${id}.json`))) as Observable<Route[]>;
   }
 }

@@ -7,7 +7,7 @@ import {combineLatest} from 'rxjs';
 import {Feature, FeatureCollection, LineString} from 'geojson';
 import {setClosestRoutes} from '../store/route/route.actions';
 import {NodesFacadeService} from '../services/nodesFacade.service';
-import {ClosestRoute} from '../store/route/route.types';
+import {ClosestRoute, Route} from '../store/route/route.types';
 
 @Injectable()
 export class CurrentRouteEffects {
@@ -25,17 +25,16 @@ export class CurrentRouteEffects {
   constructor(private actions$: Actions, private nodesFacade: NodesFacadeService) {
   }
 
-  private getClosestRoutes(routes: FeatureCollection[], coords: Coordinates): ClosestRoute[] {
+  private getClosestRoutes(routes: Route[], coords: Coordinates): ClosestRoute[] {
     return routes
-      .map(route => {
-        const feature = route.features[0] as Feature<LineString>;
+      .map(feature => {
         return {
           route: feature,
           point: nearestPointOnLine(feature.geometry, [coords.longitude, coords.latitude], {units: 'meters'}),
         };
       })
       .sort((a, b) => a.point.properties.dist - b.point.properties.dist)
-      .splice(0, 3);
+      .splice(0, 1);
   }
 
 }

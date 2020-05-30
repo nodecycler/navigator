@@ -34,7 +34,7 @@ const calculateDestinationAndProgress = (
   if (prevProgress < nextProgress) {
     return [route.properties.end_geoid, nextProgress];
   } else {
-    return [route.properties.begin_geoid, route.properties.Shape_Length - nextProgress];
+    return [route.properties.begin_geoid, route.properties.distance - nextProgress];
   }
 };
 

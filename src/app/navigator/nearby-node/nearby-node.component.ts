@@ -22,7 +22,6 @@ export class NearbyNodeComponent implements OnInit {
   ngOnInit() {
     this.routeFacade.activeRoute$.subscribe((routeState: RouteState) => {
       this.currentRouteId = routeState && routeState.route ? routeState.route.properties.pid : null;
-      console.log(this.currentRouteId);
     });
     this.routeFacade.destinationNode$
       .pipe(
@@ -33,13 +32,10 @@ export class NearbyNodeComponent implements OnInit {
           const remaining = destination.total - destination.progress;
           return remaining < nodeIsNearbyDistance ? destination.node : null;
         })
-      ).subscribe(node => {
-      this.node = node;
-      if (node) {
-        console.log(this.node.connections);
-
-      }
-    });
+      )
+      .subscribe(node => {
+        this.node = node;
+      });
   }
 
   formatDistance(distance) {
