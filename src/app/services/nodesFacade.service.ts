@@ -2,12 +2,13 @@ import {Injectable} from '@angular/core';
 import {AppState} from '../store';
 import {createSelector, Store} from '@ngrx/store';
 import {mergeMap} from 'rxjs/operators';
-import {combineLatest, Observable} from 'rxjs';
+import {combineLatest, Observable, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {Feature, FeatureCollection, LineString} from 'geojson';
 import {Route} from '../store/route/route.types';
 
-const selectNodes = (state: AppState) => state.nodes;
+const selectNodes = (state: AppState) => state.nodes.nodes;
+const selectRoutes = (state: AppState) => state.nodes.routes;
 
 const selectRouteIds = createSelector(selectNodes,
   (nodes) => {
@@ -25,10 +26,7 @@ const selectRouteIds = createSelector(selectNodes,
 @Injectable()
 export class NodesFacadeService {
   public nodes$ = this.store.select(selectNodes);
-  public routeIds$ = this.store.select(selectRouteIds);
-  public routes$ = this.routeIds$.pipe(
-    mergeMap(routeIds => this.fetchRouteDataForRouteIds(routeIds))
-  );
+  public routes$ = this.store.select(selectRoutes);
 
   constructor(private store: Store<AppState>, private http: HttpClient) {
   }

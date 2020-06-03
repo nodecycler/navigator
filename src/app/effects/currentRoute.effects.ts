@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Actions, createEffect, ofType} from '@ngrx/effects';
 import {map} from 'rxjs/operators';
 import {nearestPointOnLine} from '@turf/turf';
-import {setPosition} from '../store/position/position.actions';
+import {Coords, setPosition} from '../store/position/position.actions';
 import {combineLatest} from 'rxjs';
 import {Feature, FeatureCollection, LineString} from 'geojson';
 import {setClosestRoutes} from '../store/route/route.actions';
@@ -11,6 +11,7 @@ import {ClosestRoute, Route} from '../store/route/route.types';
 
 @Injectable()
 export class CurrentRouteEffects {
+/*
   getCurrentRoute$ = createEffect(() => combineLatest([
       this.nodesFacade.routes$,
       this.actions$.pipe(ofType(setPosition)),
@@ -21,11 +22,12 @@ export class CurrentRouteEffects {
         })
       )
   );
+*/
 
   constructor(private actions$: Actions, private nodesFacade: NodesFacadeService) {
   }
 
-  private getClosestRoutes(routes: Route[], coords: Coordinates): ClosestRoute[] {
+  private getClosestRoutes(routes: Route[], coords: Coords): ClosestRoute[] {
     return routes
       .map(feature => {
         return {

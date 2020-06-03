@@ -6,7 +6,6 @@ import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {environment} from '../../environments/environment';
 import {EffectsModule} from '@ngrx/effects';
 import {StoreModule as NgRxStoreModule} from '@ngrx/store';
-import {FetchNodesEffects} from '../effects/fetchNodes.effects';
 import {CurrentRouteEffects} from '../effects/currentRoute.effects';
 
 
@@ -23,7 +22,7 @@ import {CurrentRouteEffects} from '../effects/currentRoute.effects';
     }),
     HttpClientModule,
     StoreDevtoolsModule.instrument({maxAge: 25, logOnly: environment.production}),
-    EffectsModule.forRoot([FetchNodesEffects, CurrentRouteEffects]),
+    EffectsModule.forRoot([CurrentRouteEffects]),
   ]
 })
 export class StoreModule { }

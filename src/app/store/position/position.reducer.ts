@@ -16,8 +16,6 @@ const reducer = createReducer(
     error: true,
   })),
   on(Actions.setPosition, (state, {coords}) => ({
-    speed: coords.speed,
-    heading: coords.heading,
     error: false,
     location: {
       latitude: coords.latitude,

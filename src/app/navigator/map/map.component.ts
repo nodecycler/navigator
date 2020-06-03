@@ -8,6 +8,7 @@ import {PositionState} from '../../store/position/position.types';
 import {Node, NodeConnection} from '../../store/nodes/nodes.types';
 import {connectingColors, nodeIsNearbyDistance} from '../../constants';
 import {bearing as turfBearing} from '@turf/turf';
+import {Feature} from 'geojson';
 
 @Component({
   selector: 'app-map',
@@ -18,7 +19,7 @@ export class MapComponent implements OnInit {
 
   state: PositionState;
   nodes: Node[] = [];
-  routes: string[] = [];
+  routes: Feature[] = [];
   activeRoute = null;
   center = null;
   bearing = 0;
@@ -41,7 +42,7 @@ export class MapComponent implements OnInit {
     this.nodesFacade.nodes$.subscribe(nodes => {
       this.nodes = nodes;
     });
-    this.nodesFacade.routeIds$.subscribe(routes => {
+    this.nodesFacade.routes$.subscribe(routes => {
       this.routes = routes;
     });
     combineLatest([

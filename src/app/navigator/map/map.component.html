@@ -9,17 +9,20 @@
   [center]="center"
 >
   <mgl-geojson-source
-    *ngFor="let route of routes"
-    [id]="route"
-    data="./data/routes/{{route}}.json"
-  ></mgl-geojson-source>
+    id="routes"
+  >
+    <mgl-feature
+      *ngFor="let route of routes"
+      [geometry]="route.geometry"
+    ></mgl-feature>
+
+  </mgl-geojson-source>
   <mgl-layer
-    *ngFor="let route of routes"
-    id="layer-{{route}}"
-    [source]="route"
+    id="layer-routes"
+    source="routes"
     type="line"
     [paint]="{
-      'line-color': getRouteColor(route),
+      'line-color': '#579120',
       'line-width': 6
     }"
   ></mgl-layer>

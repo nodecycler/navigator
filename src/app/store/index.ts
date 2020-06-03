@@ -6,10 +6,14 @@ import {nodesReducer} from './nodes/nodes.reducer';
 import {Node} from './nodes/nodes.types';
 import {RouteState} from './route/route.types';
 import {routeReducer} from './route/route.reducer';
+import {Feature} from 'geojson';
 
 export interface AppState {
   position: PositionState;
-  nodes: Node[];
+  nodes: {
+    nodes: Node[];
+    routes: Feature[];
+  };
   route: RouteState;
 }
 

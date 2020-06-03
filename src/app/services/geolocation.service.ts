@@ -37,13 +37,8 @@ export class GeolocationService {
   dispatch(coordinates) {
     this.store.dispatch(setPosition({
       coords: {
-        accuracy: 0,
-        altitude: 0,
-        altitudeAccuracy: 0,
-        heading: 0,
         latitude: coordinates[1],
         longitude: coordinates[0],
-        speed: 0,
       }
 
     }));

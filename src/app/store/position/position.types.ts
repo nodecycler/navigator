@@ -5,6 +5,6 @@ export interface PositionState {
     longitude: number;
     latitude: number;
   };
-  speed: number;
-  heading: number;
+  speed?: number;
+  heading?: number;
 }

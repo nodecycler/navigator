@@ -14,3 +14,8 @@ export interface Node {
   connections: NodeConnection[];
   location: [number, number];
 }
+
+export interface Destination {
+  node: Node;
+  progress: number;
+}
