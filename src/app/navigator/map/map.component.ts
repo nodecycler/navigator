@@ -1,14 +1,14 @@
 import {Component, OnInit} from '@angular/core';
 import {combineLatest} from 'rxjs';
-import {filter, map, tap, throttleTime} from 'rxjs/operators';
+import {tap, throttleTime} from 'rxjs/operators';
 import {GeolocationService} from '../../services/geolocation.service';
 import {RouteFacadeService} from '../../services/routeFacade.service';
-import {NodesFacadeService} from '../../services/nodesFacade.service';
-import {PositionState} from '../../store/position/position.types';
-import {Node, NodeConnection} from '../../store/nodes/nodes.types';
+import {NeighborhoodService} from '../../services/neighborhood.service';
+import {Node, NodeConnection} from '../../store/neighborhood/neighborhood.types';
 import {connectingColors, nodeIsNearbyDistance} from '../../constants';
-import {bearing as turfBearing} from '@turf/turf';
 import {Feature} from 'geojson';
+import {Route} from '../../store/route/route.types';
+import {Coords} from '../../store/position/position.actions';
 
 @Component({
   selector: 'app-map',
@@ -17,90 +17,94 @@ import {Feature} from 'geojson';
 })
 export class MapComponent implements OnInit {
 
-  state: PositionState;
   nodes: Node[] = [];
   routes: Feature[] = [];
-  activeRoute = null;
-  center = null;
+  activeRoute: Route = null;
+  center: Coords = null;
   bearing = 0;
-  marker = null;
+  marker: Coords = null;
   zoom = 15;
   pitch = 0;
+  layerCounter = 0;
+  layers: {route: Route, id: number}[] = [];
   connectingRoutes: NodeConnection[] = [];
 
   constructor(
     private routeFacade: RouteFacadeService,
-    private nodesFacade: NodesFacadeService,
+    private neighborhood: NeighborhoodService,
     private geolocation: GeolocationService
   ) {
   }
 
   ngOnInit() {
-    this.geolocation.position$.subscribe((state: PositionState) => {
-      this.state = state;
-    });
-    this.nodesFacade.nodes$.subscribe(nodes => {
+    this.neighborhood.nodes$.subscribe(nodes => {
       this.nodes = nodes;
     });
-    this.nodesFacade.routes$.subscribe(routes => {
+    this.neighborhood.routes$.subscribe(routes => {
       this.routes = routes;
+      routes.forEach(route => {
+        if (!this.layers.find(layer => layer.route.properties.pid === route.properties.pid)) {
+          this.layers.push({id: this.layerCounter++, route});
+        }
+      });
+      this.layers = this.layers.filter(layer => routes.find(route => route.properties.pid === layer.route.properties.pid));
     });
+
     combineLatest([
       this.routeFacade.activeRoute$,
-      this.geolocation.position$.pipe(
-        filter(geo => !!geo.location)
-      ),
+      this.geolocation.improvedPosition$,
       this.routeFacade.destinationNode$,
     ])
       .pipe(
-        map(([routeState, geoState, destinationNode]) => ({
-          activeRoute: routeState.route,
-          center: routeState.point ? routeState.point.geometry.coordinates : [geoState.location.longitude, geoState.location.latitude],
-          bearing: routeState.bearing || 360,
-          destinationNode,
-        })),
-        tap(({center, activeRoute, destinationNode}) => {
-          this.marker = center;
-          this.activeRoute = activeRoute;
+        tap(([route, position, destinationNode]) => {
+          this.marker = position.position;
+          this.activeRoute = route;
           this.connectingRoutes = [];
-          if (destinationNode && destinationNode.node) {
-            const remaining = destinationNode.total - destinationNode.progress;
-            if (remaining < 200) {
+          if (destinationNode && destinationNode.node && route) {
+            const remaining = route.properties.distance - destinationNode.progress;
+            if (remaining < nodeIsNearbyDistance) {
               // NEAR THE NODE
               this.connectingRoutes = destinationNode.node.connections;
-              return;
             }
           }
         }),
         throttleTime(1000)
-      ).subscribe(({destinationNode, center, bearing, activeRoute}) => {
-      if (destinationNode && destinationNode.node) {
-        const remaining = destinationNode.total - destinationNode.progress;
-        if (remaining < nodeIsNearbyDistance) {
-          // NEAR THE NODE
-          this.center = destinationNode.node.location;
-          this.bearing = turfBearing(center, destinationNode.node.location);
-          this.zoom = 18;
-          this.pitch = 1;
+      )
+      .subscribe(([route, position, destinationNode]) => {
+        if (route) {
+          if (destinationNode && destinationNode.node) {
+            const remaining = route.properties.distance - destinationNode.progress;
+            if (remaining < nodeIsNearbyDistance) {
+              // NEAR THE NODE
+              this.center = destinationNode.node.location;
+              this.zoom = 18;
+              this.pitch = 1;
+              return;
+            }
+          }
+          this.bearing = position.bearing;
+          this.zoom = 17;
+          this.pitch = 60;
+          this.center = position.position;
           return;
         }
-      }
-      this.zoom = activeRoute ? 17 : 15;
-      this.pitch = activeRoute ? 60 : 1;
-      this.center = center;
-      this.bearing = bearing;
-    });
+        this.bearing = 360;
+        this.zoom = 15;
+        this.pitch = 1;
+        this.center = position.position;
+      });
 
   }
 
-  getRouteColor(route) {
-    if (this.activeRoute && this.activeRoute.properties.pid === route) {
+  getRouteColor(route: Route) {
+    if (this.activeRoute && this.activeRoute.properties.pid === route.properties.pid) {
       return '#579120';
     }
-    const index = this.connectingRoutes.findIndex(connection => route === connection.route);
+    const index = this.connectingRoutes.findIndex(connection => route.properties.pid === connection.route);
     if (index >= 0) {
       return connectingColors[index];
     }
     return '#85DD31';
   }
+
 }

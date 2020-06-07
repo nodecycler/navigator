@@ -1,6 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+ import {Component, OnInit} from '@angular/core';
 import {combineLatest} from 'rxjs';
 import {RouteFacadeService} from '../../services/routeFacade.service';
+ import {withLatestFrom} from 'rxjs/operators';
 
 @Component({
   selector: 'app-destination-node',
@@ -17,11 +18,21 @@ export class DestinationNodeComponent implements OnInit {
   }
 
   ngOnInit() {
-    combineLatest([this.route.destinationNode$])
-      .subscribe(([{node, progress, total}]) => {
-        this.node = node;
-        this.total = total;
-        this.progress = progress;
+    this.route.destinationNode$
+      .pipe(
+        withLatestFrom(this.route.activeRoute$)
+      )
+      .subscribe(([destination, route]) => {
+        if (destination && route) {
+          const {node, progress} = destination;
+          this.node = node;
+          this.total = route.properties.distance;
+          this.progress = progress;
+          return;
+        }
+        this.node = null;
+        this.total = null;
+        this.progress = null;
       });
   }
 

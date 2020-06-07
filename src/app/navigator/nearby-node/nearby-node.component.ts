@@ -1,9 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {RouteFacadeService} from '../../services/routeFacade.service';
-import {map} from 'rxjs/operators';
-import {Node} from '../../store/nodes/nodes.types';
+import {filter, withLatestFrom} from 'rxjs/operators';
 import {connectingColors, nodeIsNearbyDistance} from '../../constants';
-import {RouteState} from '../../store/route/route.types';
+import {Node} from '../../store/neighborhood/neighborhood.types';
 
 @Component({
   selector: 'app-nearby-node',
@@ -20,22 +19,16 @@ export class NearbyNodeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.routeFacade.activeRoute$.subscribe((routeState: RouteState) => {
-      this.currentRouteId = routeState && routeState.route ? routeState.route.properties.pid : null;
+    this.routeFacade.nearbyNode$.subscribe((nearby) => {
+      if (!nearby) {
+        this.currentRouteId = null;
+        this.node = null;
+        return;
+      }
+      const {node, currentRouteId} = nearby;
+      this.currentRouteId = currentRouteId;
+      this.node = node;
     });
-    this.routeFacade.destinationNode$
-      .pipe(
-        map(destination => {
-          if (!destination || !destination.node) {
-            return null;
-          }
-          const remaining = destination.total - destination.progress;
-          return remaining < nodeIsNearbyDistance ? destination.node : null;
-        })
-      )
-      .subscribe(node => {
-        this.node = node;
-      });
   }
 
   formatDistance(distance) {

@@ -4,9 +4,7 @@ import {metaReducers, reducers} from './index';
 import {HttpClientModule} from '@angular/common/http';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {environment} from '../../environments/environment';
-import {EffectsModule} from '@ngrx/effects';
 import {StoreModule as NgRxStoreModule} from '@ngrx/store';
-import {CurrentRouteEffects} from '../effects/currentRoute.effects';
 
 
 @NgModule({
@@ -22,7 +20,6 @@ import {CurrentRouteEffects} from '../effects/currentRoute.effects';
     }),
     HttpClientModule,
     StoreDevtoolsModule.instrument({maxAge: 25, logOnly: environment.production}),
-    EffectsModule.forRoot([CurrentRouteEffects]),
   ]
 })
 export class StoreModule { }

@@ -1,32 +1,37 @@
 import {Injectable} from '@angular/core';
 import {AppState} from '../store';
 import {createSelector, Store} from '@ngrx/store';
-import {first, map, mergeMap} from 'rxjs/operators';
+import {first, map, mergeMap, withLatestFrom} from 'rxjs/operators';
 import {combineLatest, Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {FeatureCollection} from 'geojson';
-import {NodesFacadeService} from './nodesFacade.service';
+import {NeighborhoodService} from './neighborhood.service';
+import {Destination} from '../store/route/route.types';
+import {nodeIsNearbyDistance} from '../constants';
+import {Node} from '../store/neighborhood/neighborhood.types';
 
-const selectRouteState = (state: AppState) => state.route;
-const selectClosestRoutes = createSelector(selectRouteState, (state => state.closestRoutes));
+const selectRouteState = (state: AppState) => state.route.route;
+const selectDestination = (state: AppState) => state.route.destination;
 
 @Injectable()
 export class RouteFacadeService {
 
   public activeRoute$ = this.store.select(selectRouteState);
-  public destinationNode$ = this.activeRoute$.pipe(
-    mergeMap(activeRouteState => this.nodesFacade.nodes$.pipe(
-      first(),
-      map(nodes => ({
-        node: nodes.find(node => node.id === activeRouteState.destinationNodeId),
-        progress: activeRouteState.routeProgress,
-        total: activeRouteState.route ? activeRouteState.route.properties.distance : null
-      })),
-    ))
+  public destinationNode$: Observable<Destination> = this.store.select(selectDestination);
+  public nearbyNode$: Observable<{ node: Node, progress: number, total: number, currentRouteId: string }> = this.destinationNode$.pipe(
+    withLatestFrom(this.activeRoute$),
+    map(([destination, route]) => destination &&
+      route &&
+      route.properties.distance - destination.progress < nodeIsNearbyDistance ? {
+        node: destination.node,
+        progress: destination.progress,
+        total: route.properties.distance,
+      currentRouteId: route.properties.pid
+      } : null
+    )
   );
-  public closestRoutes$ = this.store.select(selectClosestRoutes);
 
-  constructor(private store: Store<AppState>, private nodesFacade: NodesFacadeService) {
+  constructor(private store: Store<AppState>) {
   }
 
 }

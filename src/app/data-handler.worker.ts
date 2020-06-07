@@ -1,24 +1,33 @@
 /// <reference lib="webworker" />
-import {distinctUntilChanged, filter, map, mergeMap, pairwise, scan, withLatestFrom} from 'rxjs/operators';
+import {
+  distinctUntilChanged,
+  map,
+  mergeMap,
+  pairwise,
+  publishLast,
+  scan,
+  share,
+  startWith,
+  switchMap,
+  tap,
+  withLatestFrom
+} from 'rxjs/operators';
 import * as turf from '@turf/turf';
-import {Observable, Subject} from 'rxjs';
-import {Feature, FeatureCollection, LineString, Point, Polygon} from 'geojson';
-import {Destination, Node} from './store/nodes/nodes.types';
-import {ClosestRoute, Route} from './store/route/route.types';
-import {lineDistance, lineSlice, lineString, nearestPointOnLine} from '@turf/turf';
-
-interface Action {
-  type: string;
-
-  [key: string]: any;
-}
+import {combine, lineDistance, lineSlice, lineString, nearestPointOnLine} from '@turf/turf';
+import {combineLatest, Observable, Subject} from 'rxjs';
+import {Feature, FeatureCollection, LineString, Polygon} from 'geojson';
+import {Node} from './store/neighborhood/neighborhood.types';
+import {Destination, Route} from './store/route/route.types';
+import {networkIsCloseEnough} from './constants';
+import {fromPromise} from 'rxjs/internal-compatibility';
 
 type Coords = [number, number];
 
 // Create actions stream
-const actions$ = new Subject<Action>();
+const coords$ = new Subject<Coords>();
 addEventListener('message', ({data}) => {
-  actions$.next(data);
+  console.log("in", data);
+  coords$.next(data);
 });
 
 // Fetch network
@@ -55,7 +64,7 @@ function getNearbyNetworks(location: Coords): Promise<number[]> {
         const vertices = turf.explode(feature);
         const closestVertex = turf.nearest(location, vertices);
         const distance = turf.distance(location, closestVertex, {units: 'meters'});
-        return distance < 5000;
+        return distance < networkIsCloseEnough;
       })
       .map(feature => feature.properties.id)
     );
@@ -74,8 +83,7 @@ function getActiveRoute(routes: Route[], coords: Coords): Route {
   return result && result.point.properties.dist < 20 ? result.route : null;
 }
 
-
-function calculateRouteProgress (route: Feature<LineString>, point: Coords) {
+function calculateRouteProgress(route: Feature<LineString>, point: Coords) {
   if (!route || !point) {
     return null;
   }
@@ -83,7 +91,7 @@ function calculateRouteProgress (route: Feature<LineString>, point: Coords) {
   return lineDistance(slicedLine, {units: 'meters'});
 }
 
-function calculateDestinationAndProgress (
+function calculateDestinationAndProgress(
   route: Route,
   prevPoint: Coords,
   nextPoint: Coords
@@ -100,16 +108,12 @@ function calculateDestinationAndProgress (
   }
 }
 
-const position$: Observable<Coords> = actions$
-  .pipe(
-    filter((action) => action.type === '[Position] Set position'),
-    map((action) => ([action.coords.longitude, action.coords.latitude])),
-  );
+const position$: Observable<Coords> = coords$.asObservable();
 
 const debouncedPosition$ = position$.pipe(
   scan((prev, curr) => {
     if (!prev) {
-      return prev;
+      return curr;
     }
     const distance = turf.distance(prev, curr, {units: 'meters'});
     return distance > 500 ? curr : prev;
@@ -118,20 +122,20 @@ const debouncedPosition$ = position$.pipe(
 );
 
 const neighborhood$ = debouncedPosition$.pipe(
-  mergeMap(location => getNearbyNetworks(location)),
-  mergeMap(networkIds => Promise.all([fetchNodes(networkIds), fetchRoutes(networkIds)])),
-  withLatestFrom(position$),
-  map(([[nodes, routes], position]) => {
-    const nodesCloseBy = nodes.filter(node => turf.distance(node.location, position, {units: 'meters'}) < 5000);
-    const connections = [].concat.apply([], nodesCloseBy.map(node => node.connections))
-      .map(connection => connection.route);
-    const routesConnectingNodesCloseBy = routes.filter(route => connections.includes(route.properties.pid));
-    return {nodes: nodesCloseBy, routes: routesConnectingNodesCloseBy};
-  })
+  switchMap(location => fromPromise(getNearbyNetworks(location)
+    .then(networkIds => Promise.all([fetchNodes(networkIds), fetchRoutes(networkIds)]))
+    .then(([nodes, routes]) => {
+      const nodesCloseBy = nodes.filter(node => turf.distance(node.location, location, {units: 'meters'}) < 5000);
+      const connections = [].concat.apply([], nodesCloseBy.map(node => node.connections))
+        .map(connection => connection.route);
+      const routesConnectingNodesCloseBy = routes.filter(route => connections.includes(route.properties.pid));
+      return {nodes: nodesCloseBy, routes: routesConnectingNodesCloseBy};
+    })),
+  ),
 );
 
-const activeRoute$ = position$.pipe(
-  withLatestFrom(neighborhood$),
+const activeRoute$: Observable<Route> = combineLatest([position$, neighborhood$]).pipe(
+  tap(data => console.log("activeRoute$/1", data)),
   map(([position, {routes}]) => getActiveRoute(routes, position)),
   distinctUntilChanged((prev, curr) => {
     const prevPid = prev ? prev.properties.pid : null;
@@ -155,23 +159,35 @@ const destinationNode$ = position$.pipe(
     };
   }),
   distinctUntilChanged((prev, curr) => {
-    console.log("result", prev, curr);
+    if (!prev || !curr) {
+      return prev === curr;
+    }
     const prevPid = prev ? prev.node.id : null;
     const currPid = curr ? curr.node.id : null;
-    return prevPid === currPid;
+    return prevPid === currPid && prev.progress === curr.progress;
+  }),
+);
+
+const improvedPosition$ = combineLatest([position$, activeRoute$]).pipe(
+  map(([position, activeRoute]) => {
+    if (!activeRoute) {
+      return position;
+    }
+    return nearestPointOnLine(activeRoute, position).geometry.coordinates;
   }),
 );
 
 // Subscribers to post data back to app
 neighborhood$.subscribe(({nodes, routes}) => {
-  console.log('neighborhood$', nodes, routes);
   postMessage({nodes, routes});
 });
-activeRoute$.subscribe(route => {
-  console.log('activeRoute$', route);
+activeRoute$.subscribe(activeRoute => {
+  postMessage({activeRoute});
 });
-destinationNode$.subscribe(destination => {
-  console.log('destinationNode$', destination);
+destinationNode$.subscribe(destinationNode => {
+  postMessage({destinationNode});
 });
-// const response = `worker response to ${data}`;
-// postMessage(response);
+improvedPosition$.subscribe((position) => {
+  postMessage({position});
+});
+

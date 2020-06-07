@@ -1,11 +1,11 @@
 import {PositionState} from './position.types';
 import {Action, createReducer, on} from '@ngrx/store';
 import * as Actions from './position.actions';
+import {bearing} from '@turf/turf';
 
 const initialState: PositionState = {
-  speed: null,
-  heading: null,
-  location: null,
+  bearing: null,
+  position: null,
   error: false,
 };
 
@@ -15,12 +15,10 @@ const reducer = createReducer(
     ...initialState,
     error: true,
   })),
-  on(Actions.setPosition, (state, {coords}) => ({
+  on(Actions.setPosition, (state, {position}) => ({
     error: false,
-    location: {
-      latitude: coords.latitude,
-      longitude: coords.longitude,
-    }
+    position,
+    bearing: state.position ? bearing(state.position, position) : null,
   }))
 );
 

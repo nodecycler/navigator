@@ -6,4 +6,5 @@ export const connectingColors = [
   '#E86B1C',
 ];
 
-export const nodeIsNearbyDistance = 200;
+export const nodeIsNearbyDistance = 150;
+export const networkIsCloseEnough = 5000;

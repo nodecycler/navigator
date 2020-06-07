@@ -1,4 +1,6 @@
-export const ACTIVITY = [
+import {Coords} from '../app/store/position/position.actions';
+
+export const ACTIVITY: Coords[] = [
   [4.604133479297161, 51.025125570595264],
   [4.604135239496827, 51.02512875571847],
   [4.604152087122202, 51.0251219663769],

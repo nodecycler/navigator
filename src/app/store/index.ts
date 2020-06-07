@@ -2,24 +2,20 @@ import {ActionReducerMap, MetaReducer} from '@ngrx/store';
 import {environment} from '../../environments/environment';
 import {PositionState} from './position/position.types';
 import {positionReducer} from './position/position.reducer';
-import {nodesReducer} from './nodes/nodes.reducer';
-import {Node} from './nodes/nodes.types';
+import {neighborhoodReducer} from './neighborhood/neighborhood.reducer';
 import {RouteState} from './route/route.types';
 import {routeReducer} from './route/route.reducer';
-import {Feature} from 'geojson';
+import {NeighborhoodState} from './neighborhood/neighborhood.types';
 
 export interface AppState {
   position: PositionState;
-  nodes: {
-    nodes: Node[];
-    routes: Feature[];
-  };
+  neighborhood: NeighborhoodState;
   route: RouteState;
 }
 
 export const reducers: ActionReducerMap<AppState> = {
   position: positionReducer,
-  nodes: nodesReducer,
+  neighborhood: neighborhoodReducer,
   route: routeReducer,
 };
 

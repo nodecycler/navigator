@@ -1,5 +1,5 @@
-import {Feature, FeatureCollection, LineString, Point} from 'geojson';
-import {NearestPointOnLine} from '@turf/nearest-point-on-line';
+import {Feature, LineString} from 'geojson';
+import {Node} from '../neighborhood/neighborhood.types';
 
 export interface Route extends Feature<LineString> {
   properties: {
@@ -9,16 +9,13 @@ export interface Route extends Feature<LineString> {
     pid: string;
   };
 }
+
 export interface RouteState {
   route: Route;
-  point: Feature<Point>;
-  bearing: number;
-  routeProgress: number;
-  destinationNodeId: string;
-  closestRoutes: ClosestRoute[];
+  destination: Destination;
 }
 
-export interface ClosestRoute {
-  route: Route;
-  point: NearestPointOnLine;
+export interface Destination {
+  node: Node;
+  progress: number;
 }

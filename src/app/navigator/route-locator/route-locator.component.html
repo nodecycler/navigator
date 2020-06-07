@@ -1,7 +1,7 @@
-<div class="container" *ngIf="routes && routes.length > 0">
+<div class="container" *ngIf="route">
   <p>Fiets naar een nabijgelegen route om de navigatie te starten...</p>
   <ul>
-    <li *ngFor="let route of routes">
+    <li>
       <div class="number">
         {{route.begin}}&#9656;{{route.end}}
       </div>

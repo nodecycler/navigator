@@ -1,8 +1,6 @@
 import {createAction, props} from '@ngrx/store';
 
-export interface Coords {
-  readonly latitude: number;
-  readonly longitude: number;
-}
+export type Coords = [number, number];
+
 export const geolocationError = createAction('[Position] Error');
-export const setPosition = createAction('[Position] Set position', props<{coords: Coords}>());
+export const setPosition = createAction('[Position] Set position', props<{position: Coords}>());

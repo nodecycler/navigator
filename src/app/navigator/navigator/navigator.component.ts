@@ -1,7 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import {GeolocationService} from '../../services/geolocation.service';
-import {RouteFacadeService} from '../../services/routeFacade.service';
-import {filter, first} from 'rxjs/operators';
+import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-navigator',

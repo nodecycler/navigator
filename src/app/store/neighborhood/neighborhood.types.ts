@@ -1,3 +1,4 @@
+import {Route} from '../route/route.types';
 
 export interface NodeConnection {
   id: string;
@@ -15,7 +16,8 @@ export interface Node {
   location: [number, number];
 }
 
-export interface Destination {
-  node: Node;
-  progress: number;
+
+export interface NeighborhoodState {
+  nodes: Node[];
+  routes: Route[];
 }

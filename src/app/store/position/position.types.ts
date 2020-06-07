@@ -1,10 +1,8 @@
+import {Coords} from './position.actions';
+
 export interface PositionState {
   error?: any;
   isSupported?: boolean;
-  location: {
-    longitude: number;
-    latitude: number;
-  };
-  speed?: number;
-  heading?: number;
+  position: Coords;
+  bearing: number;
 }

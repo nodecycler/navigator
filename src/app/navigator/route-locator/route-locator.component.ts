@@ -1,11 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {RouteFacadeService} from '../../services/routeFacade.service';
-import {NodesFacadeService} from '../../services/nodesFacade.service';
-import {combineLatest, Observable} from 'rxjs';
-import {map, tap} from 'rxjs/operators';
-import {Node} from '../../store/nodes/nodes.types';
-import {GeolocationService} from '../../services/geolocation.service';
+import {NeighborhoodService} from '../../services/neighborhood.service';
+import {combineLatest, of} from 'rxjs';
+import {map, mergeMap, tap, withLatestFrom} from 'rxjs/operators';
 import {bearing} from '@turf/turf';
+import {GeolocationService} from '../../services/geolocation.service';
 
 interface RouteViewInterface {
   begin: string;
@@ -20,32 +19,37 @@ interface RouteViewInterface {
   styleUrls: ['./route-locator.component.scss']
 })
 export class RouteLocatorComponent implements OnInit {
-  routes: RouteViewInterface[];
+  route: RouteViewInterface;
 
   constructor(
+    private neighborhood: NeighborhoodService,
     private routeFacade: RouteFacadeService,
-    private nodesFacade: NodesFacadeService,
-    private geolocation: GeolocationService
+    private geo: GeolocationService,
   ) {
   }
 
   ngOnInit() {
-    combineLatest([this.geolocation.position$, this.routeFacade.closestRoutes$, this.nodesFacade.nodes$])
+    combineLatest([this.routeFacade.activeRoute$, this.neighborhood.closestRoute$]).pipe(
+      map(([active, closest]) => {
+        return active ? null : closest;
+      })
+    )
       .pipe(
-        map(([position, routes, nodes]) => {
-          return routes.map(({route, point}) => {
-            const begin = nodes.find(node => node.id === route.properties.begin_geoid).number;
-            const end = nodes.find(node => node.id === route.properties.end_geoid).number;
-            return {
-              begin,
-              end,
-              distance: this.getDistance(point),
-              bearingStyle: `rotate(${this.getBearing(point, position.location)}deg)`,
-            };
-          });
-        })
-      ).subscribe(routes => {
-      this.routes = routes;
+          withLatestFrom(this.neighborhood.nodes$, this.geo.improvedPosition$),
+      )
+      .subscribe(([route, nodes, position]) => {
+        if (!route) {
+          this.route = null;
+          return;
+        }
+        const begin = nodes.find(node => node.id === route.route.properties.begin_geoid).number;
+        const end = nodes.find(node => node.id === route.route.properties.end_geoid).number;
+        this.route = {
+          begin,
+          end,
+          distance: this.getDistance(route.point),
+          bearingStyle: `rotate(${this.getBearing(route.point, position.position)}deg)`,
+        };
     });
   }
 
@@ -58,6 +62,6 @@ export class RouteLocatorComponent implements OnInit {
   }
 
   getBearing(point, position) {
-    return bearing([position.longitude, position.latitude], point);
+    return bearing(position, point);
   }
 }
