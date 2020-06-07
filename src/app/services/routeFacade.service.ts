@@ -1,11 +1,8 @@
 import {Injectable} from '@angular/core';
 import {AppState} from '../store';
-import {createSelector, Store} from '@ngrx/store';
-import {first, map, mergeMap, withLatestFrom} from 'rxjs/operators';
-import {combineLatest, Observable} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
-import {FeatureCollection} from 'geojson';
-import {NeighborhoodService} from './neighborhood.service';
+import {Store} from '@ngrx/store';
+import {map, withLatestFrom} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 import {Destination} from '../store/route/route.types';
 import {nodeIsNearbyDistance} from '../constants';
 import {Node} from '../store/neighborhood/neighborhood.types';

@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {AppState} from '../store';
 import {Store} from '@ngrx/store';
-import {HttpClient} from '@angular/common/http';
 import {map, withLatestFrom} from 'rxjs/operators';
 import {nearestPointOnLine} from '@turf/turf';
 import {Route} from '../store/route/route.types';

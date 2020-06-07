@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {RouteFacadeService} from '../../services/routeFacade.service';
-import {filter, withLatestFrom} from 'rxjs/operators';
-import {connectingColors, nodeIsNearbyDistance} from '../../constants';
+import {connectingColors} from '../../constants';
 import {Node} from '../../store/neighborhood/neighborhood.types';
 
 @Component({

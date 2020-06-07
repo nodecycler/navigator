@@ -1,19 +1,7 @@
 /// <reference lib="webworker" />
-import {
-  distinctUntilChanged,
-  map,
-  mergeMap,
-  pairwise,
-  publishLast,
-  scan,
-  share,
-  startWith,
-  switchMap,
-  tap,
-  withLatestFrom
-} from 'rxjs/operators';
+import {distinctUntilChanged, map, pairwise, scan, switchMap, tap, withLatestFrom} from 'rxjs/operators';
 import * as turf from '@turf/turf';
-import {combine, lineDistance, lineSlice, lineString, nearestPointOnLine} from '@turf/turf';
+import {lineDistance, lineSlice, lineString, nearestPointOnLine} from '@turf/turf';
 import {combineLatest, Observable, Subject} from 'rxjs';
 import {Feature, FeatureCollection, LineString, Polygon} from 'geojson';
 import {Node} from './store/neighborhood/neighborhood.types';
@@ -21,36 +9,41 @@ import {Destination, Route} from './store/route/route.types';
 import {networkIsCloseEnough} from './constants';
 import {fromPromise} from 'rxjs/internal-compatibility';
 
+// Fetch can't handle file:// url's - which are in use in Cordova
+function fetch<T>(url): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = () => {
+      resolve(JSON.parse(xhr.responseText) as T);
+    };
+    xhr.onerror = () => {
+      reject(new TypeError('Local request failed'));
+    };
+    xhr.open('GET', url);
+    xhr.send(null);
+  });
+}
+
 type Coords = [number, number];
 
 // Create actions stream
 const coords$ = new Subject<Coords>();
 addEventListener('message', ({data}) => {
-  console.log("in", data);
   coords$.next(data);
 });
 
 // Fetch network
-const fetchNetworks: Promise<FeatureCollection> = fetch('./data/networks.json')
-  .then(result => result.json());
+const fetchNetworks: Promise<FeatureCollection> = fetch('./data/networks.json');
 
 function fetchNodes(networkIds: number[]): Promise<Node[]> {
   return Promise.all(
-    networkIds.map(network =>
-      fetch(`./data/nodes_${network}.json`)
-        .then(response => response.json())
-    )
+    networkIds.map(network => fetch(`./data/nodes_${network}.json`))
   )
     .then(fetchResults => [].concat.apply([], fetchResults));
 }
 
 function fetchRoutes(networkIds: number[]): Promise<Route[]> {
-  return Promise.all(
-    networkIds.map(network =>
-      fetch(`./data/routes_${network}.json`)
-        .then(response => response.json())
-    )
-  )
+  return Promise.all(networkIds.map(network => fetch(`./data/routes_${network}.json`)))
     .then((fetchResults: FeatureCollection[]) => [].concat.apply([], fetchResults.map(col => col.features)));
 }
 
@@ -91,11 +84,7 @@ function calculateRouteProgress(route: Feature<LineString>, point: Coords) {
   return lineDistance(slicedLine, {units: 'meters'});
 }
 
-function calculateDestinationAndProgress(
-  route: Route,
-  prevPoint: Coords,
-  nextPoint: Coords
-): [string, number] {
+function calculateDestinationAndProgress(route: Route, prevPoint: Coords, nextPoint: Coords): [string, number] {
   const prevProgress = calculateRouteProgress(route, prevPoint);
   const nextProgress = calculateRouteProgress(route, nextPoint);
   if (!prevProgress || !nextProgress) {
@@ -135,7 +124,6 @@ const neighborhood$ = debouncedPosition$.pipe(
 );
 
 const activeRoute$: Observable<Route> = combineLatest([position$, neighborhood$]).pipe(
-  tap(data => console.log("activeRoute$/1", data)),
   map(([position, {routes}]) => getActiveRoute(routes, position)),
   distinctUntilChanged((prev, curr) => {
     const prevPid = prev ? prev.properties.pid : null;

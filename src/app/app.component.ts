@@ -42,7 +42,6 @@ export class AppComponent implements OnInit {
         console.error(err);
       };
       worker.onmessage = ({data}) => {
-        console.log(Object.keys(data));
         if (data.hasOwnProperty('nodes')) {
           this.store.dispatch(setNeighborhood({nodes: data.nodes, routes: data.routes}));
         }

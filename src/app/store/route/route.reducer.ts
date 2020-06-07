@@ -1,7 +1,6 @@
 import {Action, createReducer, on} from '@ngrx/store';
 import * as Actions from './route.actions';
 import {RouteState} from './route.types';
-import {bearing} from '@turf/turf';
 
 const initialState: RouteState = {
   route: null,

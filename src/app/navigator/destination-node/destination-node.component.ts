@@ -1,7 +1,6 @@
- import {Component, OnInit} from '@angular/core';
-import {combineLatest} from 'rxjs';
+import {Component, OnInit} from '@angular/core';
 import {RouteFacadeService} from '../../services/routeFacade.service';
- import {withLatestFrom} from 'rxjs/operators';
+import {withLatestFrom} from 'rxjs/operators';
 
 @Component({
   selector: 'app-destination-node',

@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {RouteFacadeService} from '../../services/routeFacade.service';
 import {NeighborhoodService} from '../../services/neighborhood.service';
-import {combineLatest, of} from 'rxjs';
-import {map, mergeMap, tap, withLatestFrom} from 'rxjs/operators';
+import {combineLatest} from 'rxjs';
+import {map, withLatestFrom} from 'rxjs/operators';
 import {bearing} from '@turf/turf';
 import {GeolocationService} from '../../services/geolocation.service';
 

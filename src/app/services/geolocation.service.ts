@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Store} from '@ngrx/store';
 import {AppState} from '../store';
-import {Coords, geolocationError, setPosition} from '../store/position/position.actions';
+import {Coords, geolocationError} from '../store/position/position.actions';
 import {Subject} from 'rxjs';
 
 @Injectable({

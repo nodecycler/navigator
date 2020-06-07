@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Store} from '@ngrx/store';
 import {AppState} from '../store';
-import {Coords, setPosition} from '../store/position/position.actions';
+import {Coords} from '../store/position/position.actions';
 
 import {ACTIVITY} from '../../mock/activity';
 import {Subject} from 'rxjs';
