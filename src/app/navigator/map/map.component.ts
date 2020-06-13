@@ -22,6 +22,7 @@ export class MapComponent implements OnInit {
   activeRoute: Route = null;
   center: Coords = null;
   bearing = 0;
+  markerBearing = 0;
   marker: Coords = null;
   zoom = 15;
   pitch = 0;
@@ -71,6 +72,7 @@ export class MapComponent implements OnInit {
         throttleTime(1000)
       )
       .subscribe(([route, position, destinationNode]) => {
+        this.markerBearing = position.bearing;
         if (route) {
           if (destinationNode && destinationNode.node) {
             const remaining = route.properties.distance - destinationNode.progress;
@@ -95,6 +97,10 @@ export class MapComponent implements OnInit {
         this.center = position.position;
       });
 
+  }
+
+  get markerBearingStyle() {
+    return `rotate(${this.markerBearing}deg)`;
   }
 
   getRouteColor(route: Route) {
