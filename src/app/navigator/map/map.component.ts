@@ -76,6 +76,7 @@ export class MapComponent implements OnInit {
             const remaining = route.properties.distance - destinationNode.progress;
             if (remaining < nodeIsNearbyDistance) {
               // NEAR THE NODE
+              this.bearing = position.bearing;
               this.center = destinationNode.node.location;
               this.zoom = 18;
               this.pitch = 1;
