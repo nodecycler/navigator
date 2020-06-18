@@ -1,14 +1,14 @@
 <div class="container" *ngIf="node">
   <p>U nadert knooppunt <strong>{{node.number}}</strong></p>
   <ul>
-    <ng-container *ngFor="let connection of node.connections">
+    <ng-container *ngFor="let connection of connections">
 
-      <li [style.backgroundColor]="getColor(connection)" *ngIf="connection.route !== currentRouteId">
+      <li [style.backgroundColor]="connection.color">
         <div class="number">
-          {{connection.number}}
+          {{connection.connection.number}}
         </div>
         <div class="distance">
-          {{formatDistance(connection.distance)}}
+          {{formatDistance(connection.connection.distance)}}
         </div>
       </li>
     </ng-container>

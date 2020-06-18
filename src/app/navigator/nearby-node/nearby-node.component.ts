@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {RouteFacadeService} from '../../services/routeFacade.service';
 import {connectingColors} from '../../constants';
 import {Node} from '../../store/neighborhood/neighborhood.types';
+import {bearing} from '@turf/turf';
 
 @Component({
   selector: 'app-nearby-node',
@@ -39,5 +40,15 @@ export class NearbyNodeComponent implements OnInit {
 
   getColor(connection) {
     return connectingColors[this.node.connections.indexOf(connection)];
+  }
+  get connections() {
+    return this.node.connections
+      .filter(connection => connection.route !== this.currentRouteId)
+      .map(connection => ({
+        connection,
+        color: this.getColor(connection),
+        bearing: bearing(this.node.location, connection.location)
+      }))
+      .sort((a, b) => a.bearing - b.bearing);
   }
 }
